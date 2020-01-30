@@ -62,4 +62,17 @@ const getFullVPNStatus = async () => {
       }' terminal=false`
     );
   }
+
+  if (fullStatus.Connected) {
+    console.log("---");
+    const kys = Object.keys(fullStatus);
+    for (var i = 2; i < kys.length; i++) {
+      console.log(
+        `${kys[i]}: <span color='orange'><i>${fullStatus[kys[i]]}</i></span>`
+      );
+    }
+  }
+
+  console.log("---");
+  console.log("<b>Author: </b><span color='pink'><i>p0p3yee</i></span>");
 })();
