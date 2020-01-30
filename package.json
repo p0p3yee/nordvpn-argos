@@ -1,0 +1,28 @@
+{
+  "name": "nordvpn-argos",
+  "version": "1.0.0",
+  "description": "GNOME NordVPN Shell extension",
+  "main": "nord.r.2s.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p0p3yee/nordvpn-argos.git"
+  },
+  "keywords": [
+    "nordvpn",
+    "gnome",
+    "nodejs",
+    "argos"
+  ],
+  "author": "p0p3yee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/p0p3yee/nordvpn-argos/issues"
+  },
+  "homepage": "https://github.com/p0p3yee/nordvpn-argos#readme",
+  "dependencies": {
+    "mz": "2.7.0"
+  }
+}
