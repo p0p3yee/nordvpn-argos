@@ -1,30 +1,42 @@
 #!/bin/node
-
-const {exec} = require("mz/child_process");
+const { exec } = require("mz/child_process");
 
 const CMD = "nordvpn";
 const CMDSTR = {
-	STATUS: `${CMD} status`
+  STATUS: `${CMD} status`,
+  CONNECT_AUTO: `${CMD} connect`,
+  DISCONNECT: `${CMD} disconnect`
+};
+const newOutput = (txt, color) => {
+  return {
+    text: txt,
+    color: color
+  };
 };
 
 const getVPNStatus = async () => {
-	try{
-		const [out] = await exec(CMDSTR.STATUS);
-		return out.split("Status: ")[1].includes("Disconnected") ? "Disconnected" : "Connected";
-	}catch(e){
-		return null;
-	}
-}
+  try {
+    const [out] = await exec(CMDSTR.STATUS);
+    const vpnStatus = out.split("Status: ")[1].split("\n")[0];
+    return newOutput(
+      vpnStatus,
+      vpnStatus === "Disconnected"
+        ? "yellow"
+        : vpnStatus === "Connecting"
+        ? "blue"
+        : "#09FF00"
+    );
+  } catch (e) {
+    return newOutput("ERROR", "red");
+  }
+};
 
 (async () => {
-	
-	const vpnStatus = await getVPNStatus();
-	if (!vpnStatus) {
-		console.log("ERROR | color='red'")
-		return;
-	} else {
-		const attr = vpnStatus === "Disconnected" ? "color='yellow'" : "color='green'";
-		console.log(`VPN Status: ${vpnStatus} | ${attr}`)
-	}
-
+  const vpnStatus = await getVPNStatus();
+  const titleStr = `NordVPN: <span color='${vpnStatus.color}'>${vpnStatus.text}</span>`;
+  console.log(titleStr);
+  console.log(`---`);
+  console.log(titleStr);
+  console.log(`Connect to VPN | bash='${CMDSTR.CONNECT_AUTO}' terminal=false`);
+  console.log(`Disconnect VPN | bash='${CMDSTR.DISCONNECT}' terminal=false`);
 })();
