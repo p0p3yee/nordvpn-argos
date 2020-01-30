@@ -7,36 +7,59 @@ const CMDSTR = {
   CONNECT_AUTO: `${CMD} connect`,
   DISCONNECT: `${CMD} disconnect`
 };
-const newOutput = (txt, color) => {
+
+const getStatusAttr = fullStatus =>
+  fullStatus.Connected
+    ? { text: "Connected", color: "#09FF00" }
+    : fullStatus.Connecting
+    ? { text: "Connecting", color: "blue" }
+    : { text: "Disconnected", color: "yellow" };
+const newVPNStatus = (connected, isConnecting, server, country, city, ip) => {
   return {
-    text: txt,
-    color: color
+    Connected: connected,
+    Connecting: isConnecting,
+    Server: server,
+    Country: country,
+    City: city,
+    NewIP: ip
   };
 };
 
-const getVPNStatus = async () => {
+const getFullVPNStatus = async () => {
   try {
     const [out] = await exec(CMDSTR.STATUS);
-    const vpnStatus = out.split("Status: ")[1].split("\n")[0];
-    return newOutput(
-      vpnStatus,
-      vpnStatus === "Disconnected"
-        ? "yellow"
-        : vpnStatus === "Connecting"
-        ? "blue"
-        : "#09FF00"
-    );
+    const vpnStatus = out.split("Status: ")[1].split("\n");
+    const isConnected = vpnStatus[0] === "Connected";
+    const isConnecting = vpnStatus[0] === "Connecting";
+    return !isConnected
+      ? newVPNStatus(isConnected, isConnecting)
+      : newVPNStatus(
+          isConnected,
+          isConnecting,
+          vpnStatus[1].split("Current server: ")[1],
+          vpnStatus[2].split("Country: ")[1],
+          vpnStatus[3].split("City: ")[1],
+          vpnStatus[4].split("Your new IP: ")[1]
+        );
   } catch (e) {
-    return newOutput("ERROR", "red");
+    return null;
   }
 };
 
 (async () => {
-  const vpnStatus = await getVPNStatus();
-  const titleStr = `NordVPN: <span color='${vpnStatus.color}'>${vpnStatus.text}</span>`;
+  const fullStatus = await getFullVPNStatus();
+  const attr = getStatusAttr(fullStatus);
+  const titleStr = `NordVPN: <span color='${attr.color}'>${attr.text}</span>`;
   console.log(titleStr);
   console.log(`---`);
   console.log(titleStr);
-  console.log(`Connect to VPN | bash='${CMDSTR.CONNECT_AUTO}' terminal=false`);
-  console.log(`Disconnect VPN | bash='${CMDSTR.DISCONNECT}' terminal=false`);
+  if (fullStatus.Connecting) {
+    console.log("Nord VPN is connecting...");
+  } else {
+    console.log(
+      `${fullStatus.Connected ? "Disconnect" : "Connect to"} VPN | bash='${
+        fullStatus.Connected ? CMDSTR.DISCONNECT : CMDSTR.CONNECT_AUTO
+      }' terminal=false`
+    );
+  }
 })();
