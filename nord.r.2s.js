@@ -74,5 +74,7 @@ const getFullVPNStatus = async () => {
   }
 
   console.log("---");
-  console.log("<b>Author: </b><span color='pink'><i>p0p3yee</i></span>");
+  console.log(
+    "<b>Author: </b><span color='pink'><i>p0p3yee</i></span> | href='https://github.com/p0p3yee'"
+  );
 })();
